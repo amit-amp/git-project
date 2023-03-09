@@ -13,12 +13,6 @@ import * as graphql from "@nestjs/graphql";
 import * as apollo from "apollo-server-express";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
-import * as gqlACGuard from "../../auth/gqlAC.guard";
-import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
-import * as common from "@nestjs/common";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { CreateCategoryArgs } from "./CreateCategoryArgs";
 import { UpdateCategoryArgs } from "./UpdateCategoryArgs";
 import { DeleteCategoryArgs } from "./DeleteCategoryArgs";
@@ -27,20 +21,10 @@ import { CategoryFindUniqueArgs } from "./CategoryFindUniqueArgs";
 import { Category } from "./Category";
 import { VariableCategory } from "../../variableCategory/base/VariableCategory";
 import { CategoryService } from "../category.service";
-@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Category)
 export class CategoryResolverBase {
-  constructor(
-    protected readonly service: CategoryService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
+  constructor(protected readonly service: CategoryService) {}
 
-  @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "read",
-    possession: "any",
-  })
   async _categoriesMeta(
     @graphql.Args() args: CategoryFindManyArgs
   ): Promise<MetaQueryPayload> {
@@ -54,26 +38,14 @@ export class CategoryResolverBase {
     };
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Category])
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "read",
-    possession: "any",
-  })
   async categories(
     @graphql.Args() args: CategoryFindManyArgs
   ): Promise<Category[]> {
     return this.service.findMany(args);
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Category, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "read",
-    possession: "own",
-  })
   async category(
     @graphql.Args() args: CategoryFindUniqueArgs
   ): Promise<Category | null> {
@@ -84,13 +56,7 @@ export class CategoryResolverBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Category)
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "create",
-    possession: "any",
-  })
   async createCategory(
     @graphql.Args() args: CreateCategoryArgs
   ): Promise<Category> {
@@ -108,13 +74,7 @@ export class CategoryResolverBase {
     });
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => Category)
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "update",
-    possession: "any",
-  })
   async updateCategory(
     @graphql.Args() args: UpdateCategoryArgs
   ): Promise<Category | null> {
@@ -142,11 +102,6 @@ export class CategoryResolverBase {
   }
 
   @graphql.Mutation(() => Category)
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "delete",
-    possession: "any",
-  })
   async deleteCategory(
     @graphql.Args() args: DeleteCategoryArgs
   ): Promise<Category | null> {
@@ -162,13 +117,7 @@ export class CategoryResolverBase {
     }
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => VariableCategory, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "read",
-    possession: "any",
-  })
   async variableCategory(
     @graphql.Parent() parent: Category
   ): Promise<VariableCategory | null> {

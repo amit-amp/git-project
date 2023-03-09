@@ -13,12 +13,6 @@ import * as graphql from "@nestjs/graphql";
 import * as apollo from "apollo-server-express";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
-import * as nestAccessControl from "nest-access-control";
-import * as gqlACGuard from "../../auth/gqlAC.guard";
-import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
-import * as common from "@nestjs/common";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { CreateVariableCategoryArgs } from "./CreateVariableCategoryArgs";
 import { UpdateVariableCategoryArgs } from "./UpdateVariableCategoryArgs";
 import { DeleteVariableCategoryArgs } from "./DeleteVariableCategoryArgs";
@@ -31,20 +25,10 @@ import { VariableFindManyArgs } from "../../variable/base/VariableFindManyArgs";
 import { Variable } from "../../variable/base/Variable";
 import { User } from "../../user/base/User";
 import { VariableCategoryService } from "../variableCategory.service";
-@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
-@graphql.Resolver(() => Variablecategory)
+@graphql.Resolver(() => VariableCategory)
 export class VariableCategoryResolverBase {
-  constructor(
-    protected readonly service: VariableCategoryService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
+  constructor(protected readonly service: VariableCategoryService) {}
 
-  @graphql.Query(() => MetaQueryPayload)
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "read",
-    possession: "any",
-  })
   async _variableCategoriesMeta(
     @graphql.Args() args: VariableCategoryFindManyArgs
   ): Promise<MetaQueryPayload> {
@@ -58,26 +42,14 @@ export class VariableCategoryResolverBase {
     };
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [VariableCategory])
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "read",
-    possession: "any",
-  })
   async variableCategories(
     @graphql.Args() args: VariableCategoryFindManyArgs
   ): Promise<VariableCategory[]> {
     return this.service.findMany(args);
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => VariableCategory, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "read",
-    possession: "own",
-  })
   async variableCategory(
     @graphql.Args() args: VariableCategoryFindUniqueArgs
   ): Promise<VariableCategory | null> {
@@ -88,13 +60,7 @@ export class VariableCategoryResolverBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => VariableCategory)
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "create",
-    possession: "any",
-  })
   async createVariableCategory(
     @graphql.Args() args: CreateVariableCategoryArgs
   ): Promise<VariableCategory> {
@@ -112,13 +78,7 @@ export class VariableCategoryResolverBase {
     });
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @graphql.Mutation(() => VariableCategory)
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async updateVariableCategory(
     @graphql.Args() args: UpdateVariableCategoryArgs
   ): Promise<VariableCategory | null> {
@@ -146,11 +106,6 @@ export class VariableCategoryResolverBase {
   }
 
   @graphql.Mutation(() => VariableCategory)
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "delete",
-    possession: "any",
-  })
   async deleteVariableCategory(
     @graphql.Args() args: DeleteVariableCategoryArgs
   ): Promise<VariableCategory | null> {
@@ -166,13 +121,7 @@ export class VariableCategoryResolverBase {
     }
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Category])
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "read",
-    possession: "any",
-  })
   async categories(
     @graphql.Parent() parent: VariableCategory,
     @graphql.Args() args: CategoryFindManyArgs
@@ -186,13 +135,7 @@ export class VariableCategoryResolverBase {
     return results;
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => [Variable])
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "read",
-    possession: "any",
-  })
   async variables(
     @graphql.Parent() parent: VariableCategory,
     @graphql.Args() args: VariableFindManyArgs
@@ -206,13 +149,7 @@ export class VariableCategoryResolverBase {
     return results;
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.ResolveField(() => User, { nullable: true })
-  @nestAccessControl.UseRoles({
-    resource: "User",
-    action: "read",
-    possession: "any",
-  })
   async user(@graphql.Parent() parent: VariableCategory): Promise<User | null> {
     const result = await this.service.getUser(parent.id);
 

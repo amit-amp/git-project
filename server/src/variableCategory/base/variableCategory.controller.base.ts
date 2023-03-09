@@ -16,11 +16,7 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { VariableCategoryService } from "../variableCategory.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { VariableCategoryCreateInput } from "./VariableCategoryCreateInput";
 import { VariableCategoryWhereInput } from "./VariableCategoryWhereInput";
 import { VariableCategoryWhereUniqueInput } from "./VariableCategoryWhereUniqueInput";
@@ -34,24 +30,10 @@ import { VariableFindManyArgs } from "../../variable/base/VariableFindManyArgs";
 import { Variable } from "../../variable/base/Variable";
 import { VariableWhereUniqueInput } from "../../variable/base/VariableWhereUniqueInput";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class VariableCategoryControllerBase {
-  constructor(
-    protected readonly service: VariableCategoryService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+  constructor(protected readonly service: VariableCategoryService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: VariableCategory })
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async create(
     @common.Body() data: VariableCategoryCreateInput
   ): Promise<VariableCategory> {
@@ -79,18 +61,9 @@ export class VariableCategoryControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [VariableCategory] })
   @ApiNestedQuery(VariableCategoryFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async findMany(@common.Req() request: Request): Promise<VariableCategory[]> {
     const args = plainToClass(VariableCategoryFindManyArgs, request.query);
     return this.service.findMany({
@@ -109,18 +82,9 @@ export class VariableCategoryControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: VariableCategory })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async findOne(
     @common.Param() params: VariableCategoryWhereUniqueInput
   ): Promise<VariableCategory | null> {
@@ -146,18 +110,9 @@ export class VariableCategoryControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: VariableCategory })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async update(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() data: VariableCategoryUpdateInput
@@ -199,14 +154,6 @@ export class VariableCategoryControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: VariableCategory })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async delete(
     @common.Param() params: VariableCategoryWhereUniqueInput
   ): Promise<VariableCategory | null> {
@@ -235,14 +182,8 @@ export class VariableCategoryControllerBase {
     }
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/categories")
   @ApiNestedQuery(CategoryFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Category",
-    action: "read",
-    possession: "any",
-  })
   async findManyCategories(
     @common.Req() request: Request,
     @common.Param() params: VariableCategoryWhereUniqueInput
@@ -272,11 +213,6 @@ export class VariableCategoryControllerBase {
   }
 
   @common.Post("/:id/categories")
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async connectCategories(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() body: CategoryWhereUniqueInput[]
@@ -294,11 +230,6 @@ export class VariableCategoryControllerBase {
   }
 
   @common.Patch("/:id/categories")
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async updateCategories(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() body: CategoryWhereUniqueInput[]
@@ -316,11 +247,6 @@ export class VariableCategoryControllerBase {
   }
 
   @common.Delete("/:id/categories")
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async disconnectCategories(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() body: CategoryWhereUniqueInput[]
@@ -337,14 +263,8 @@ export class VariableCategoryControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id/variables")
   @ApiNestedQuery(VariableFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "read",
-    possession: "any",
-  })
   async findManyVariables(
     @common.Req() request: Request,
     @common.Param() params: VariableCategoryWhereUniqueInput
@@ -374,11 +294,6 @@ export class VariableCategoryControllerBase {
   }
 
   @common.Post("/:id/variables")
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async connectVariables(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() body: VariableWhereUniqueInput[]
@@ -396,11 +311,6 @@ export class VariableCategoryControllerBase {
   }
 
   @common.Patch("/:id/variables")
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async updateVariables(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() body: VariableWhereUniqueInput[]
@@ -418,11 +328,6 @@ export class VariableCategoryControllerBase {
   }
 
   @common.Delete("/:id/variables")
-  @nestAccessControl.UseRoles({
-    resource: "VariableCategory",
-    action: "update",
-    possession: "any",
-  })
   async disconnectVariables(
     @common.Param() params: VariableCategoryWhereUniqueInput,
     @common.Body() body: VariableWhereUniqueInput[]

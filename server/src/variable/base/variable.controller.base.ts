@@ -16,11 +16,7 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
-import * as nestAccessControl from "nest-access-control";
-import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { VariableService } from "../variable.service";
-import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
-import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { VariableCreateInput } from "./VariableCreateInput";
 import { VariableWhereInput } from "./VariableWhereInput";
 import { VariableWhereUniqueInput } from "./VariableWhereUniqueInput";
@@ -28,24 +24,10 @@ import { VariableFindManyArgs } from "./VariableFindManyArgs";
 import { VariableUpdateInput } from "./VariableUpdateInput";
 import { Variable } from "./Variable";
 
-@swagger.ApiBearerAuth()
-@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class VariableControllerBase {
-  constructor(
-    protected readonly service: VariableService,
-    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
-  ) {}
-  @common.UseInterceptors(AclValidateRequestInterceptor)
+  constructor(protected readonly service: VariableService) {}
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Variable })
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "create",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async create(@common.Body() data: VariableCreateInput): Promise<Variable> {
     return await this.service.create({
       data: {
@@ -72,18 +54,9 @@ export class VariableControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [Variable] })
   @ApiNestedQuery(VariableFindManyArgs)
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "read",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async findMany(@common.Req() request: Request): Promise<Variable[]> {
     const args = plainToClass(VariableFindManyArgs, request.query);
     return this.service.findMany({
@@ -103,18 +76,9 @@ export class VariableControllerBase {
     });
   }
 
-  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Variable })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "read",
-    possession: "own",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async findOne(
     @common.Param() params: VariableWhereUniqueInput
   ): Promise<Variable | null> {
@@ -141,18 +105,9 @@ export class VariableControllerBase {
     return result;
   }
 
-  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Variable })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "update",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async update(
     @common.Param() params: VariableWhereUniqueInput,
     @common.Body() data: VariableUpdateInput
@@ -195,14 +150,6 @@ export class VariableControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Variable })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
-  @nestAccessControl.UseRoles({
-    resource: "Variable",
-    action: "delete",
-    possession: "any",
-  })
-  @swagger.ApiForbiddenResponse({
-    type: errors.ForbiddenException,
-  })
   async delete(
     @common.Param() params: VariableWhereUniqueInput
   ): Promise<Variable | null> {

@@ -25,8 +25,8 @@ import { DeleteUserArgs } from "./DeleteUserArgs";
 import { UserFindManyArgs } from "./UserFindManyArgs";
 import { UserFindUniqueArgs } from "./UserFindUniqueArgs";
 import { User } from "./User";
-import { GitSpaceFindManyArgs } from "../../gitSpace/base/GitSpaceFindManyArgs";
-import { GitSpace } from "../../gitSpace/base/GitSpace";
+import { VariableCategoryFindManyArgs } from "../../variableCategory/base/VariableCategoryFindManyArgs";
+import { VariableCategory } from "../../variableCategory/base/VariableCategory";
 import { UserService } from "../user.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => User)
@@ -138,17 +138,17 @@ export class UserResolverBase {
   }
 
   @common.UseInterceptors(AclFilterResponseInterceptor)
-  @graphql.ResolveField(() => [GitSpace])
+  @graphql.ResolveField(() => [VariableCategory])
   @nestAccessControl.UseRoles({
-    resource: "GitSpace",
+    resource: "VariableCategory",
     action: "read",
     possession: "any",
   })
-  async gitSpace(
+  async variableCategories(
     @graphql.Parent() parent: User,
-    @graphql.Args() args: GitSpaceFindManyArgs
-  ): Promise<GitSpace[]> {
-    const results = await this.service.findGitSpace(parent.id, args);
+    @graphql.Args() args: VariableCategoryFindManyArgs
+  ): Promise<VariableCategory[]> {
+    const results = await this.service.findVariableCategories(parent.id, args);
 
     if (!results) {
       return [];

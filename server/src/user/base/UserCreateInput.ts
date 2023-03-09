@@ -11,11 +11,11 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, ValidateNested, IsJSON } from "class-validator";
-import { GitSpaceCreateNestedManyWithoutUsersInput } from "./GitSpaceCreateNestedManyWithoutUsersInput";
-import { Type } from "class-transformer";
+import { IsString, IsOptional, IsJSON, ValidateNested } from "class-validator";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { VariableCategoryCreateNestedManyWithoutUsersInput } from "./VariableCategoryCreateNestedManyWithoutUsersInput";
+import { Type } from "class-transformer";
 
 @InputType()
 class UserCreateInput {
@@ -29,18 +29,6 @@ class UserCreateInput {
     nullable: true,
   })
   firstName?: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => GitSpaceCreateNestedManyWithoutUsersInput,
-  })
-  @ValidateNested()
-  @Type(() => GitSpaceCreateNestedManyWithoutUsersInput)
-  @IsOptional()
-  @Field(() => GitSpaceCreateNestedManyWithoutUsersInput, {
-    nullable: true,
-  })
-  gitSpace?: GitSpaceCreateNestedManyWithoutUsersInput;
 
   @ApiProperty({
     required: false,
@@ -75,6 +63,18 @@ class UserCreateInput {
   @IsString()
   @Field(() => String)
   username!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => VariableCategoryCreateNestedManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => VariableCategoryCreateNestedManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => VariableCategoryCreateNestedManyWithoutUsersInput, {
+    nullable: true,
+  })
+  variableCategories?: VariableCategoryCreateNestedManyWithoutUsersInput;
 }
 
 export { UserCreateInput as UserCreateInput };

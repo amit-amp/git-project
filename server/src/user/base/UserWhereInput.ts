@@ -14,8 +14,8 @@ import { ApiProperty } from "@nestjs/swagger";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested } from "class-validator";
-import { GitSpaceListRelationFilter } from "../../gitSpace/base/GitSpaceListRelationFilter";
 import { StringFilter } from "../../util/StringFilter";
+import { VariableCategoryListRelationFilter } from "../../variableCategory/base/VariableCategoryListRelationFilter";
 
 @InputType()
 class UserWhereInput {
@@ -29,18 +29,6 @@ class UserWhereInput {
     nullable: true,
   })
   firstName?: StringNullableFilter;
-
-  @ApiProperty({
-    required: false,
-    type: () => GitSpaceListRelationFilter,
-  })
-  @ValidateNested()
-  @Type(() => GitSpaceListRelationFilter)
-  @IsOptional()
-  @Field(() => GitSpaceListRelationFilter, {
-    nullable: true,
-  })
-  gitSpace?: GitSpaceListRelationFilter;
 
   @ApiProperty({
     required: false,
@@ -74,6 +62,18 @@ class UserWhereInput {
     nullable: true,
   })
   username?: StringFilter;
+
+  @ApiProperty({
+    required: false,
+    type: () => VariableCategoryListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => VariableCategoryListRelationFilter)
+  @IsOptional()
+  @Field(() => VariableCategoryListRelationFilter, {
+    nullable: true,
+  })
+  variableCategories?: VariableCategoryListRelationFilter;
 }
 
 export { UserWhereInput as UserWhereInput };

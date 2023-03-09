@@ -15,13 +15,13 @@ import {
   IsDate,
   IsString,
   IsOptional,
-  ValidateNested,
   IsJSON,
+  ValidateNested,
 } from "class-validator";
 import { Type } from "class-transformer";
-import { GitSpace } from "../../gitSpace/base/GitSpace";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { VariableCategory } from "../../variableCategory/base/VariableCategory";
 
 @ObjectType()
 class User {
@@ -43,15 +43,6 @@ class User {
     nullable: true,
   })
   firstName!: string | null;
-
-  @ApiProperty({
-    required: false,
-    type: () => [GitSpace],
-  })
-  @ValidateNested()
-  @Type(() => GitSpace)
-  @IsOptional()
-  gitSpace?: Array<GitSpace>;
 
   @ApiProperty({
     required: true,
@@ -94,6 +85,15 @@ class User {
   @IsString()
   @Field(() => String)
   username!: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => [VariableCategory],
+  })
+  @ValidateNested()
+  @Type(() => VariableCategory)
+  @IsOptional()
+  variableCategories?: Array<VariableCategory>;
 }
 
 export { User as User };
